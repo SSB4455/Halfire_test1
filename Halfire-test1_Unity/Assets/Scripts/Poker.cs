@@ -206,20 +206,20 @@ public class Poker
 				break;
 			}
 
-			maxCard1 = GetMaxCardValue(tempHand1);
-			maxCard2 = GetMaxCardValue(tempHand2);
-			if (maxCard1 > maxCard2)
+			var maxCard1s = tempHand1.Select(card => card.num).OrderByDescending(value => value).ToList();
+			var maxCard2s = tempHand2.Select(card => card.num).OrderByDescending(value => value).ToList();
+			for (int i = 0; i < maxCard1s.Count && i < maxCard2s.Count; i++)
 			{
-				return -1;
+				if (maxCard1s[i] > maxCard2s[i])
+				{
+					return -1;
+				}
+				else if (maxCard2s[i] > maxCard1s[i])
+				{
+					return 1;
+				}
 			}
-			else if (maxCard2 > maxCard1)
-			{
-				return 1;
-			}
-			else
-			{
-				return 0; // 平局
-			}
+			return 0; // 平局
 		}
 	}
 

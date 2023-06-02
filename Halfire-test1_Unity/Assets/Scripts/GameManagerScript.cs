@@ -31,23 +31,35 @@ public class GameManagerScript : MonoBehaviour
 
 		/*List<Poker> hand1 = new List<Poker>
 		{
-			new Poker("3", 7),
-			new Poker("4", 7),
-			new Poker("3", 4),
-			new Poker("4", 4),
+			new Poker("3", 13),
+			new Poker("4", 11),
+			new Poker("3", 2),
+			new Poker("4", 2),
 			new Poker("3", 14)
 		};
 		List<Poker> hand2 = new List<Poker>
 		{
-			new Poker("3", 7),
-			new Poker("4", 7),
 			new Poker("3", 4),
-			new Poker("1", 4),
-			new Poker("2", 1)
+			new Poker("4", 9),
+			new Poker("3", 2),
+			new Poker("1", 2),
+			new Poker("2", 14)
+		};
+		List<Poker> hand3 = new List<Poker>
+		{
+			new Poker("3", 14),
+			new Poker("4", 14),
+			new Poker("3", 6),
+			new Poker("1", 8),
+			new Poker("2", 10),
+			new Poker("1", 12),
+			new Poker("2", 9)
 		};
 		Debug.Log($"Hand 1: {string.Join(", ", hand1)}, HandRank: {Poker.GetHandRank(hand1)}");
 		Debug.Log($"Hand 2: {string.Join(", ", hand2)}, HandRank: {Poker.GetHandRank(hand2)}");
-		Debug.Log($"Winner: {Poker.CompareHands(hand1, hand2)}");*/
+		Debug.Log($"Hand 3: {string.Join(", ", hand3)}, BestHand5: {string.Join(", ", Poker.GetBestHand5(hand3))}");
+		Debug.Log($"Winner: {Poker.CompareHands(hand1, hand2)}");
+		*/
 	}
 
 	public void ReGame()
