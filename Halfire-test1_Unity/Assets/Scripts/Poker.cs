@@ -29,7 +29,7 @@ public class Poker
 	}
 	
 
-	private static List<List<Poker>> SevenToFiveGroups(List<Poker> map)
+	public static List<List<Poker>> SevenToFiveGroups(List<Poker> map)
 	{
 		List<List<Poker>> hand5List = new List<List<Poker>>();
 		for (int a = 0; a < 3; a++)
@@ -83,8 +83,10 @@ public class Poker
 
 	public static int CompareHands(List<Poker> hand1, List<Poker> hand2)
 	{
-		var rank1 = GetHandRank(hand1);
-		var rank2 = GetHandRank(hand2);
+		List<Poker> tempHand1 = new List<Poker>(hand1);
+		List<Poker> tempHand2 = new List<Poker>(hand2);
+		var rank1 = GetHandRank(tempHand1);
+		var rank2 = GetHandRank(tempHand2);
 
 		if (rank1 > rank2)
 		{
@@ -97,13 +99,13 @@ public class Poker
 		else
 		{
 			// 比较最大的单牌
-			int maxCard1 = GetMaxCardValue(hand1);
-			int maxCard2 = GetMaxCardValue(hand2);
+			int maxCard1 = GetMaxCardValue(tempHand1);
+			int maxCard2 = GetMaxCardValue(tempHand2);
 			switch (rank1)
 			{
 			case HandRank.OnePair:
-				maxCard1 = GetCardValueCounts(hand1).FirstOrDefault(pair => pair.Value == 2).Key;
-				maxCard2 = GetCardValueCounts(hand2).FirstOrDefault(pair => pair.Value == 2).Key;
+				maxCard1 = GetCardValueCounts(tempHand1).FirstOrDefault(pair => pair.Value == 2).Key;
+				maxCard2 = GetCardValueCounts(tempHand2).FirstOrDefault(pair => pair.Value == 2).Key;
 				if (maxCard1 > maxCard2)
 				{
 					return -1;
@@ -112,16 +114,16 @@ public class Poker
 				{
 					return 1;
 				}
-				hand1.RemoveAll(card => card.num == maxCard1);
-				hand2.RemoveAll(card => card.num == maxCard2);
+				tempHand1.RemoveAll(card => card.num == maxCard1);
+				tempHand2.RemoveAll(card => card.num == maxCard2);
 				break;
 			case HandRank.TwoPairs:
-				List<int> hand1Pairs = GetCardValueCounts(hand1).Where(card => card.Value == 2).Select(card => card.Key).OrderBy(value => value).ToList();
-				List<int> hand2Pairs = GetCardValueCounts(hand2).Where(card => card.Value == 2).Select(card => card.Key).OrderBy(value => value).ToList();
+				List<int> tempHand1Pairs = GetCardValueCounts(tempHand1).Where(card => card.Value == 2).Select(card => card.Key).OrderBy(value => value).ToList();
+				List<int> tempHand2Pairs = GetCardValueCounts(tempHand2).Where(card => card.Value == 2).Select(card => card.Key).OrderBy(value => value).ToList();
 				for (int i = 0; i < 2; i++)
 				{
-					maxCard1 = hand1Pairs[i];
-					maxCard2 = hand2Pairs[i];
+					maxCard1 = tempHand1Pairs[i];
+					maxCard2 = tempHand2Pairs[i];
 					if (maxCard1 > maxCard2)
 					{
 						return -1;
@@ -131,12 +133,12 @@ public class Poker
 						return 1;
 					}
 				}
-				hand1.RemoveAll(card => hand1Pairs.Contains(card.num));
-				hand2.RemoveAll(card => hand2Pairs.Contains(card.num));
+				tempHand1.RemoveAll(card => tempHand1Pairs.Contains(card.num));
+				tempHand2.RemoveAll(card => tempHand2Pairs.Contains(card.num));
 				break;
 			case HandRank.ThreeOfAKind:
-				maxCard1 = GetCardValueCounts(hand1).FirstOrDefault(pair => pair.Value == 3).Key;
-				maxCard2 = GetCardValueCounts(hand2).FirstOrDefault(pair => pair.Value == 3).Key;
+				maxCard1 = GetCardValueCounts(tempHand1).FirstOrDefault(pair => pair.Value == 3).Key;
+				maxCard2 = GetCardValueCounts(tempHand2).FirstOrDefault(pair => pair.Value == 3).Key;
 				if (maxCard1 > maxCard2)
 				{
 					return -1;
@@ -145,16 +147,16 @@ public class Poker
 				{
 					return 1;
 				}
-				hand1.RemoveAll(card => card.num == maxCard1);
-				hand2.RemoveAll(card => card.num == maxCard2);
+				tempHand1.RemoveAll(card => card.num == maxCard1);
+				tempHand2.RemoveAll(card => card.num == maxCard2);
 				break;
 			case HandRank.Straight:
 				break;
 			case HandRank.Flush:
 				break;
 			case HandRank.FullHouse:
-				maxCard1 = GetCardValueCounts(hand1).FirstOrDefault(pair => pair.Value == 3).Key;
-				maxCard2 = GetCardValueCounts(hand2).FirstOrDefault(pair => pair.Value == 3).Key;
+				maxCard1 = GetCardValueCounts(tempHand1).FirstOrDefault(pair => pair.Value == 3).Key;
+				maxCard2 = GetCardValueCounts(tempHand2).FirstOrDefault(pair => pair.Value == 3).Key;
 				if (maxCard1 > maxCard2)
 				{
 					return -1;
@@ -163,10 +165,10 @@ public class Poker
 				{
 					return 1;
 				}
-				hand1.RemoveAll(card => card.num == maxCard1);
-				hand2.RemoveAll(card => card.num == maxCard2);
-				maxCard1 = GetCardValueCounts(hand1).FirstOrDefault(pair => pair.Value == 2).Key;
-				maxCard2 = GetCardValueCounts(hand2).FirstOrDefault(pair => pair.Value == 2).Key;
+				tempHand1.RemoveAll(card => card.num == maxCard1);
+				tempHand2.RemoveAll(card => card.num == maxCard2);
+				maxCard1 = GetCardValueCounts(tempHand1).FirstOrDefault(pair => pair.Value == 2).Key;
+				maxCard2 = GetCardValueCounts(tempHand2).FirstOrDefault(pair => pair.Value == 2).Key;
 				if (maxCard1 > maxCard2)
 				{
 					return -1;
@@ -175,12 +177,12 @@ public class Poker
 				{
 					return 1;
 				}
-				hand1.RemoveAll(card => card.num == maxCard1);
-				hand2.RemoveAll(card => card.num == maxCard2);
+				tempHand1.RemoveAll(card => card.num == maxCard1);
+				tempHand2.RemoveAll(card => card.num == maxCard2);
 				break;
 			case HandRank.FourOfAKind:
-				maxCard1 = GetCardValueCounts(hand1).FirstOrDefault(pair => pair.Value == 4).Key;
-				maxCard2 = GetCardValueCounts(hand2).FirstOrDefault(pair => pair.Value == 4).Key;
+				maxCard1 = GetCardValueCounts(tempHand1).FirstOrDefault(pair => pair.Value == 4).Key;
+				maxCard2 = GetCardValueCounts(tempHand2).FirstOrDefault(pair => pair.Value == 4).Key;
 				if (maxCard1 > maxCard2)
 				{
 					return -1;
@@ -189,23 +191,23 @@ public class Poker
 				{
 					return 1;
 				}
-				hand1.RemoveAll(card => card.num == maxCard1);
-				hand2.RemoveAll(card => card.num == maxCard2);
+				tempHand1.RemoveAll(card => card.num == maxCard1);
+				tempHand2.RemoveAll(card => card.num == maxCard2);
 				break;
 			case HandRank.StraightFlush:
-				if (hand1.Any(card => card.num == 14))
+				if (tempHand1.Any(card => card.num == 14))
 				{
 					return 1;
 				}
-				else if (hand2.Any(card => card.num == 14))
+				else if (tempHand2.Any(card => card.num == 14))
 				{
 					return -1;
 				}
 				break;
 			}
 
-			maxCard1 = GetMaxCardValue(hand1);
-			maxCard2 = GetMaxCardValue(hand2);
+			maxCard1 = GetMaxCardValue(tempHand1);
+			maxCard2 = GetMaxCardValue(tempHand2);
 			if (maxCard1 > maxCard2)
 			{
 				return -1;

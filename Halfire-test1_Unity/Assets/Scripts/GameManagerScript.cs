@@ -1,16 +1,67 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManagerScript : MonoBehaviour
 {
 	List<Poker> allPockerList = new List<Poker>();
+	List<Poker> showCardList = new List<Poker>();
+	int dealCount;
+	public PokerCardScript pokerCardPerfab;
+	public Sprite[] cardSprites;
+	public RectTransform dealPanel;
+	public Button dealButton;
+	public Button compareButton;
+	public Text resultText;
+	PlayerScript[] players;
+
 
 
 
 	// Start is called before the first frame update
 	void Start()
 	{
+		players = GameObject.FindObjectsOfType<PlayerScript>();
+		for (int i = 0; i < players.Length; i++)
+		{
+			players[i].gameManager = this;
+		}
+
+		ReGame();
+
+		/*List<Poker> hand1 = new List<Poker>
+		{
+			new Poker("3", 7),
+			new Poker("4", 7),
+			new Poker("3", 4),
+			new Poker("4", 4),
+			new Poker("3", 14)
+		};
+		List<Poker> hand2 = new List<Poker>
+		{
+			new Poker("3", 7),
+			new Poker("4", 7),
+			new Poker("3", 4),
+			new Poker("1", 4),
+			new Poker("2", 1)
+		};
+		Debug.Log($"Hand 1: {string.Join(", ", hand1)}, HandRank: {Poker.GetHandRank(hand1)}");
+		Debug.Log($"Hand 2: {string.Join(", ", hand2)}, HandRank: {Poker.GetHandRank(hand2)}");
+		Debug.Log($"Winner: {Poker.CompareHands(hand1, hand2)}");*/
+	}
+
+	public void ReGame()
+	{
+		resultText.text = "";
+		dealButton.interactable = true;
+		compareButton.interactable = false;
+		Text buttonText = compareButton.GetComponentInChildren<Text>();
+		buttonText.text = "COMPARE";
+		compareButton.onClick.RemoveAllListeners();
+		compareButton.onClick.AddListener(CompareButton);
+		dealCount = 0;
+		allPockerList.Clear();
+		showCardList.Clear();
 		string[] tags = { "♥", "♠", "♣", "♦" };
 		for (int i = 0; i < 4; i++)
 		{
@@ -20,50 +71,21 @@ public class GameManagerScript : MonoBehaviour
 				allPockerList.Add(new Poker(tag, j + 2));
 			}
 		}
-		Debug.Log(string.Join(", ", allPockerList));
+		//Debug.Log(string.Join(", ", allPockerList));
 		RandomPoker();
-		Debug.Log(string.Join(", ", allPockerList));
-		
-		
-		List<Poker> hand1 = new List<Poker>();
-		List<Poker> hand2 = new List<Poker>();
+		//Debug.Log(string.Join(", ", allPockerList));
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < players.Length; i++)
 		{
-			hand1.Add(GetCard());
-			hand2.Add(GetCard());
+			players[i].ReGame();
+			players[i].AddCard(GetCard());
+			players[i].AddCard(GetCard());
 		}
-		for (int i = 0; i < 3; i++)
-		{
-			Poker card = GetCard();
-			hand1.Add(card);
-			hand2.Add(card);
-		}
-
-		hand1 = new List<Poker>
-        {
-            new Poker("3", 7),
-            new Poker("4", 7),
-            new Poker("3", 4),
-            new Poker("4", 4),
-            new Poker("3", 14)
-        };
-		hand2 = new List<Poker>
-        {
-            new Poker("3", 7),
-            new Poker("4", 7),
-            new Poker("3", 4),
-            new Poker("1", 4),
-            new Poker("2", 1)
-        };
-
-		List<int> hand1Pairs = hand1.Where(card => card.num == 2).Select(card => card.num).OrderBy(value => value).ToList();
-		Debug.Log($"hand1Pairs: {string.Join(", ", hand1Pairs)}");
 		
-
-		Debug.Log($"Hand 1: {string.Join(", ", hand1)}, HandRank: {Poker.GetHandRank(hand1)}");
-		Debug.Log($"Hand 2: {string.Join(", ", hand2)}, HandRank: {Poker.GetHandRank(hand2)}");
-		Debug.Log($"Winner: {Poker.CompareHands(hand1, hand2)}");
+		while (dealPanel.childCount > 0)
+		{
+			DestroyImmediate(dealPanel.GetChild(0).gameObject);
+		}
 	}
 
 	public void RandomPoker()
@@ -82,11 +104,74 @@ public class GameManagerScript : MonoBehaviour
 		}
 	}
 
-	public Poker GetCard(PlayerScript player = null)
+	public Poker GetCard()
 	{
 		Poker card = allPockerList[0];
 		allPockerList.RemoveAt(0);
 		return card;
+	}
+
+	public Sprite GetCardSprite(Poker card)
+	{
+		int index = 0;
+		switch (card.tag)
+		{
+			case "♥":
+			index = 0 * 13;
+			break;
+			case "♠":
+			index = 1 * 13;
+			break;
+			case "♣":
+			index = 2 * 13;
+			break;
+			case "♦":
+			index = 3 * 13;
+			break;
+		}
+		index += (card.num - 1) % 13;
+		return cardSprites[index];
+	}
+
+	public void DealButton()
+	{
+		int loopCount = dealCount == 0 ? 3 : 1;
+		for (int i = 0; i < loopCount; i++)
+		{
+			Poker card = GetCard();
+			PokerCardScript pokerCardObj = Instantiate(pokerCardPerfab, dealPanel);
+			pokerCardObj.cardSprite = GetCardSprite(card);
+			pokerCardObj.ShowCard();
+			showCardList.Add(card);
+			if (showCardList.Count > 4)
+			{
+				dealButton.interactable = false;
+				compareButton.interactable = true;
+			}
+			Debug.Log($"GetCard {card}\tshowCardList.Count {showCardList.Count}");
+		}
+		dealCount++;
+	}
+
+	public void CompareButton()
+	{
+		List<List<Poker>> playerHands = new List<List<Poker>>();
+		for (int i = 0; i < players.Length; i++)
+		{
+			players[i].ShowHandCard();
+			List<Poker> hand = players[i].GetBestHand(showCardList);
+			playerHands.Add(hand);
+			Debug.Log($"{players[i].name}'s best Hand: {string.Join(", ", hand)}, HandRank: {Poker.GetHandRank(hand)}");
+		}
+
+		int result = Poker.CompareHands(playerHands[0], playerHands[1]);
+
+		resultText.text = result != 0 ? (result > 0 ? $"{players[1].name} Win" : $"{players[0].name} Win") : "平局";
+
+		Text buttonText = compareButton.GetComponentInChildren<Text>();
+		buttonText.text = "NEW";
+		compareButton.onClick.RemoveAllListeners();
+		compareButton.onClick.AddListener(ReGame);
 	}
 
 	// Update is called once per frame
