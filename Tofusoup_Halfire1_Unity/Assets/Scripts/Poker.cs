@@ -320,6 +320,10 @@ public class Poker
 		var values = hand.Select(card => card.num).OrderBy(value => value).ToList();
 		if (values.Contains(14))
 		{
+			if (hand.Sum(card => card.num) == 60)
+			{
+				return true;
+			}
 			values.Remove(14);
 			values.Insert(0, 1);
 		}
