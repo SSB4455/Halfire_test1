@@ -8,7 +8,7 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.recorder": {
-      "version": "3.0.3",
+      "version": "3.0.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
