@@ -320,7 +320,7 @@ public class Poker
 		var values = hand.Select(card => card.num).OrderBy(value => value).ToList();
 		if (values.Contains(14))
 		{
-			if (hand.Sum(card => card.num) == 60)
+			if (hand.Sum(card => card.num) == 60 && hand.Count == new HashSet<int>(hand.Select(card => card.num)).Count)
 			{
 				return true;
 			}
